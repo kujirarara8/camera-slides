@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>カメラ授業スライド</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  :root{
+    --ink:#1c1a17;
+    --ink-soft:#54504a;
+    --ink-faint:#928c83;
+    --gold:#a8814e;
+    --gold-deep:#7d5d34;
+    --paper:#ffffff;
+    --cream:#f6f2ec;
+    --line:#e4ddd2;
+    --mincho:"Hiragino Mincho ProN","Yu Mincho","YuMincho","Noto Serif JP",serif;
+    --gothic:"Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic","Noto Sans JP",sans-serif;
+  }
+  body { font-family:var(--gothic); color:var(--ink); background:#dcdcdc; }
+  .page {
+    width:1280px; height:720px; background:var(--paper); position:relative;
+    margin:24px auto; overflow:hidden;
+  }
+  .pad { position:absolute; inset:0; padding:92px 104px; display:flex; flex-direction:column; justify-content:center; }
+
+  .kicker { font-family:var(--gothic); font-size:20px; letter-spacing:.32em; color:var(--gold-deep); font-weight:500; text-transform:uppercase; }
+  .chapno { font-family:var(--mincho); font-size:120px; line-height:1; color:var(--cream); position:absolute; right:96px; top:72px; font-weight:600; letter-spacing:.02em; }
+  h1 { font-family:var(--mincho); font-weight:600; line-height:1.28; letter-spacing:.04em; }
+  h2 { font-family:var(--mincho); font-weight:600; line-height:1.34; letter-spacing:.04em; font-size:52px; }
+  h2 em { font-style:normal; color:var(--gold-deep); }
+  h3 { font-family:var(--mincho); font-weight:600; }
+  .rule { width:64px; height:1px; background:var(--gold); margin:30px 0; }
+  .lead { font-size:27px; line-height:1.9; color:var(--ink-soft); letter-spacing:.03em; }
+  .note { font-size:21px; color:var(--ink-faint); line-height:1.8; letter-spacing:.02em; }
+
+  /* COVER / full-bleed photo pages */
+  .cover .bg, .chapter .bg { position:absolute; inset:0; }
+  .cover .bg img, .chapter .bg img { width:100%; height:100%; object-fit:cover; }
+  .cover .scrim { position:absolute; inset:0; background:linear-gradient(90deg, rgba(20,18,15,.72) 0%, rgba(20,18,15,.42) 45%, rgba(20,18,15,.12) 100%); }
+  .cover .pad, .chapter .pad { z-index:2; }
+  .cover .kicker { color:#e8c79a; }
+  .cover h1 { color:#fff; font-size:62px; }
+  .cover .tagline { font-family:var(--gothic); color:rgba(255,255,255,.86); font-size:25px; letter-spacing:.06em; margin-top:8px; }
+  .cover .by { position:absolute; left:104px; bottom:78px; color:rgba(255,255,255,.7); font-size:20px; letter-spacing:.08em; z-index:2; }
+  .cover .rule { background:#e8c79a; }
+
+  .chapter .scrim { position:absolute; inset:0; background:linear-gradient(180deg, rgba(20,18,15,.25) 0%, rgba(20,18,15,.55) 100%); }
+  .chapter .kicker { color:#e8c79a; }
+  .chapter h2 { color:#fff; font-size:60px; }
+  .chapter ol { list-style:none; margin-top:36px; }
+  .chapter ol li { color:rgba(255,255,255,.92); font-family:var(--mincho); font-size:30px; letter-spacing:.05em; padding:12px 0; display:flex; align-items:baseline; gap:22px; }
+  .chapter ol li span { color:#e8c79a; font-size:20px; letter-spacing:.12em; }
+
+  /* two-card */
+  .duo { display:flex; gap:40px; margin-top:10px; }
+  .card { flex:1; background:var(--cream); padding:44px 40px; border-top:2px solid var(--gold); }
+  .card .tag { font-family:var(--gothic); font-size:19px; letter-spacing:.16em; color:var(--gold-deep); font-weight:500; }
+  .card h3 { font-size:34px; margin:14px 0 18px; }
+  .card p { font-size:23px; line-height:1.75; color:var(--ink-soft); }
+
+  /* points list */
+  ul.pts { list-style:none; margin-top:6px; }
+  ul.pts li { font-size:27px; line-height:1.6; color:var(--ink); padding:16px 0 16px 40px; position:relative; letter-spacing:.02em; border-bottom:1px solid var(--line); }
+  ul.pts li:last-child { border-bottom:none; }
+  ul.pts li::before { content:""; position:absolute; left:6px; top:30px; width:8px; height:8px; background:var(--gold); transform:rotate(45deg); }
+  ul.pts li b { font-weight:500; }
+  .ng { color:#9a4a3c; }
+
+  /* comparison 3 */
+  .triple { display:flex; gap:24px; align-items:stretch; margin-top:8px; }
+  .triple .ph { flex:1; text-align:center; }
+  .triple .ph .frame { height:392px; overflow:hidden; }
+  .triple .ph img { width:100%; height:100%; object-fit:cover; }
+  .triple .ph .cap { font-family:var(--mincho); font-size:25px; margin-top:18px; color:var(--ink); letter-spacing:.04em; }
+  .triple .ph .sub { font-size:18px; color:var(--ink-faint); margin-top:4px; }
+  .triple .ar { align-self:center; font-size:19px; color:var(--gold-deep); letter-spacing:.1em; padding-bottom:80px; white-space:nowrap; font-weight:500; }
+
+  /* split photo+text */
+  .split { display:flex; height:100%; }
+  .split .ph { flex:0 0 46%; position:relative; }
+  .split .ph img { width:100%; height:100%; object-fit:cover; }
+  .split .tx { flex:1; padding:92px 84px; display:flex; flex-direction:column; justify-content:center; }
+  .split .tx .kicker { margin-bottom:18px; }
+
+  /* screenshot layout */
+  .shot { display:flex; height:100%; align-items:center; gap:0; }
+  .shot .ph { flex:0 0 38%; height:100%; background:var(--cream); display:flex; align-items:center; justify-content:center; }
+  .shot .ph img { height:560px; box-shadow:0 12px 40px rgba(0,0,0,.14); }
+  .shot .tx { flex:1; padding:0 88px; }
+
+  /* steps */
+  .steps { margin-top:14px; }
+  .stp { display:flex; align-items:center; gap:32px; padding:22px 0; border-bottom:1px solid var(--line); }
+  .stp:last-child { border-bottom:none; }
+  .stp .n { font-family:var(--mincho); font-size:46px; color:var(--gold); font-weight:600; flex:0 0 56px; line-height:1; }
+  .stp .lb { font-size:32px; font-family:var(--mincho); letter-spacing:.04em; }
+  .stp .ds { font-size:21px; color:var(--ink-faint); margin-left:auto; letter-spacing:.04em; }
+
+  .bigmsg { font-family:var(--mincho); font-size:40px; line-height:1.5; letter-spacing:.04em; color:var(--ink); }
+  .bigmsg em { font-style:normal; color:var(--gold-deep); }
+</style>
+</head>
+<body>
+
+<div class="page cover" data-document-role="page" data-label="1 タイトル" data-speaker-notes="こんにちは、ふみやです。今日は45分でカメラの授業をやります。やることはシンプルで、ライトを組む・自分のスマホで撮る・その場でLightroomで編集する、の3ステップ。そのあと15分は質問タイムです。">
+  <div class="bg"><img src="img/pattern1.jpg" alt=""></div>
+  <div class="scrim"></div>
+  <div class="pad">
+    <div class="kicker">ハンドメイド作家のための撮影講座</div>
+    <div class="rule"></div>
+    <h1>スマホで「売れる」<br>商品写真の撮り方</h1>
+    <div class="tagline">ライティング × 編集で、作品の魅力を最大限に</div>
+  </div>
+  <div class="by">講師　ふみや（フォトグラファー）</div>
+</div>
+
+<div class="page" data-document-role="page" data-label="2 JPEGとRAW" data-speaker-notes="スマホには2つの保存形式があります。JPEGはコンビニ弁当。出来上がった状態で、後から味付けできない。RAWは生の食材。自分で塩加減も火加減も決められる。同じことを写真でやります。">
+  <div class="chapno">01</div>
+  <div class="pad">
+    <h2>写真には、2つの「<em>保存形式</em>」があります</h2>
+    <div class="rule"></div>
+    <div class="duo">
+      <div class="card"><div class="tag">JPEG</div><h3>コンビニ弁当</h3><p>出来上がった状態で渡される。おいしいけど、後から味付けは変えられない。</p></div>
+      <div class="card"><div class="tag">RAW</div><h3>生の食材</h3><p>まだ何も処理されていない状態。塩加減も火加減も、全部自分で決められる。</p></div>
+    </div>
+  </div>
+</div>
+
+<div class="page" data-document-role="page" data-label="3 なぜRAW" data-speaker-notes="自分の商品は自分にしか作れない。世界観も色も。それを写真で表現するなら、JPEGでは触れる幅が狭くてすぐ画質が荒れます。RAWなら劣化せず、自分のイメージ通りに仕上げられる。つまり自分の作品は自分の色で出すためです。">
+  <div class="chapno">02</div>
+  <div class="pad">
+    <div class="kicker">なぜRAWで撮るのか</div>
+    <div class="rule"></div>
+    <h1 style="font-size:58px;">自分の作品は、<br><em style="color:var(--gold-deep);font-style:normal;">自分の色</em>で出す</h1>
+    <p class="lead" style="margin-top:36px;">JPEGは、色や明るさを調整できる幅が狭い。<br>RAWなら、劣化させずに自分のイメージ通りに仕上げられる。</p>
+  </div>
+</div>
+
+<div class="page" data-document-role="page" data-label="4 光が9割" data-speaker-notes="同じリングを3枚撮りました。1枚目はライトなし。地味ですよね。2枚目はライトを当てただけ。一気に輝きが出ました。これが光の力。3枚目はそれをLightroomで編集したもの。これが編集の力。いい写真はライトと編集の掛け算です。">
+  <div class="pad" style="padding:80px 88px;">
+    <h2>写真は、<em>光が9割</em></h2>
+    <div class="rule"></div>
+    <div class="triple">
+      <div class="ph"><div class="frame"><img src="img/light-off.jpg" alt="ライトなし"></div><div class="cap">ライトなし</div><div class="sub">暗くて地味</div></div>
+      <div class="ar">光の力 →</div>
+      <div class="ph"><div class="frame"><img src="img/light-on.jpg" alt="ライトあり"></div><div class="cap">ライトあり</div><div class="sub">撮って出し</div></div>
+      <div class="ar">編集の力 →</div>
+      <div class="ph"><div class="frame"><img src="img/edited.jpg" alt="編集後"></div><div class="cap">編集後</div><div class="sub">仕上げ完成</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="page" data-document-role="page" data-label="5 Lightroom" data-speaker-notes="今日使うのはLightroomというアプリ。iPhoneでもAndroidでも使えて無料です。選ぶ理由は2つ。1つはRAWで撮れること。2つは撮るときに明るさや色を自分で調整できること。これは普通のカメラアプリにはない強みです。">
+  <div class="chapno">03</div>
+  <div class="pad">
+    <h2>今日使うアプリは「<em>Lightroom</em>」（無料）</h2>
+    <div class="rule"></div>
+    <ul class="pts">
+      <li>iPhone・Android どちらでも使える／完全無料</li>
+      <li>選ぶ理由①　<b>RAW（DNG）で撮影できる</b></li>
+      <li>選ぶ理由②　<b>撮るときに明るさ・色を自分で調整できる</b>（普通のカメラにはない強み）</li>
+    </ul>
+  </div>
+</div>
+
+<div class="page" data-document-role="page" data-label="6 DNGで撮る手順" data-speaker-notes="撮り方はかんたん。アプリを開いて、右下のカメラアイコンをタップ。上の『DNG』を選ぶ。これがRAWです。あとは普通に撮るだけ。もしDNGが選べない機種なら、JPGでOK。大事なのは光なので問題ありません。">
+  <div class="shot">
+    <div class="ph"><img src="img/lightroom-screen.png" alt="Lightroom撮影画面"></div>
+    <div class="tx">
+      <div class="kicker">操作はかんたん</div>
+      <div class="rule"></div>
+      <h2 style="font-size:44px;">DNG（RAW）で撮る手順</h2>
+      <ul class="pts" style="margin-top:20px;">
+        <li>アプリを開く</li>
+        <li>右下のカメラアイコンをタップ</li>
+        <li>上の「DNG」を選ぶ（＝RAW）</li>
+        <li>あとは普通に撮るだけ</li>
+      </ul>
+      <p class="note" style="margin-top:24px;">DNGが選べない機種は「JPG」でOK</p>
+    </div>
+  </div>
+</div>
+
+<div class="page" data-document-role="page" data-label="7 iPhone Pro" data-speaker-notes="iPhoneのProシリーズの人は、純正カメラでもRAWが撮れます。対応は12 Pro以降のProとPro Max。Proが付かない普通のiPhoneは非対応です。ただ今日は全員Lightroomで揃えるので、Proの人もLightroomで撮ってもらってOKです。">
+  <div class="chapno">04</div>
+  <div class="pad">
+    <h2>iPhone「<em>Pro</em>」シリーズの人へ</h2>
+    <div class="rule"></div>
+    <ul class="pts">
+      <li>純正カメラでもRAW（Apple ProRAW）が撮れる</li>
+      <li>対応：12 / 13 / 14 / 15 / 16 / 17 の Pro・Pro Max</li>
+      <li><span class="ng">「Pro」が付かない普通のiPhone（無印）は非対応</span>　→　Lightroomで撮る</li>
+    </ul>
+    <p class="note" style="margin-top:28px;">今日は全員Lightroomで揃えるので、Proの人もLightroomでOK</p>
+  </div>
+</div>
+
+<div class="page chapter" data-document-role="page" data-label="8 ライティング扉" data-speaker-notes="ここからライティング。ライトの当て方には基本2パターンと番外編があります。1つずつ作例を見ていきましょう。">
+  <div class="bg"><img src="img/pattern2.jpg" alt=""></div>
+  <div class="scrim"></div>
+  <div class="pad">
+    <div class="kicker">Chapter — Lighting</div>
+    <div class="rule"></div>
+    <h2>ライトの当て方は、<br>2パターン＋番外編</h2>
+    <ol>
+      <li><span>01</span>　右斜め後ろ（逆光）</li>
+      <li><span>02</span>　右前（斜め前）</li>
+      <li><span>＋</span>　番外編：真上から</li>
+    </ol>
+  </div>
+</div>
+
+<div class="page" data-document-role="page" data-label="9 パターン1" data-speaker-notes="パターン1は右斜め後ろからの逆光。輪郭がはっきり出て、透明感や輝きが強調されます。ガラスやジュエリーに最適。正面が暗くなるので、白い紙の反射板で起こします。実際いちばん使う当て方です。">
+  <div class="split">
+    <div class="ph"><img src="img/pattern1.jpg" alt="右斜め後ろからのライティング"></div>
+    <div class="tx">
+      <div class="kicker">Pattern 01</div>
+      <div class="rule"></div>
+      <h2 style="font-size:44px;">右斜め後ろ<br><em>（逆光）</em></h2>
+      <ul class="pts" style="margin-top:18px;">
+        <li>輪郭がはっきり出る</li>
+        <li>透明感・輝きが強調される</li>
+        <li>ガラス・ジュエリーに最適</li>
+      </ul>
+      <p class="note" style="margin-top:22px;">反射板で正面を起こす／いちばん使う当て方</p>
+    </div>
+  </div>
+</div>
+
+<div class="page" data-document-role="page" data-label="10 パターン2" data-speaker-notes="パターン2は右前からの斜め前。質感やテクスチャ、生地感が強調されて、凹凸が立体的に見えます。アパレルや布製品に最適。反射板なしでOKでセッティングも簡単です。">
+  <div class="split">
+    <div class="ph"><img src="img/pattern2.jpg" alt="右前からのライティング"></div>
+    <div class="tx">
+      <div class="kicker">Pattern 02</div>
+      <div class="rule"></div>
+      <h2 style="font-size:44px;">右前<br><em>（斜め前）</em></h2>
+      <ul class="pts" style="margin-top:18px;">
+        <li>質感・テクスチャが強調される</li>
+        <li>生地感・凹凸が立体的に見える</li>
+        <li>アパレル・布製品に最適</li>
+      </ul>
+      <p class="note" style="margin-top:22px;">反射板なしでOK／セッティングが簡単</p>
+    </div>
+  </div>
+</div>
+
+<div class="page" data-document-role="page" data-label="11 番外編" data-speaker-notes="番外編は真上から。商品をカッコよく見せたい時に使います。ただし使う場面は限定的。基本は上の2パターンを覚えてください。">
+  <div class="split">
+    <div class="ph"><img src="img/pattern3.jpg" alt="真上からのライティング"></div>
+    <div class="tx">
+      <div class="kicker">Extra</div>
+      <div class="rule"></div>
+      <h2 style="font-size:44px;">番外編<br><em>真上から</em></h2>
+      <ul class="pts" style="margin-top:18px;">
+        <li>「カッコよく」見せたい時に使う</li>
+        <li>使う場面は限定的</li>
+      </ul>
+      <p class="note" style="margin-top:22px;">基本は上の2パターンを覚える</p>
+    </div>
+  </div>
+</div>
+
+<div class="page" data-document-role="page" data-label="12 撮り比べ" data-speaker-notes="では実際に撮ってみましょう。挙手で3人。できればiPhone・Android・一眼の人を1人ずつ。3台ともパターン1で撮って、3枚を並べて見比べます。機種が違ってもそんなに変わらないですよね。大事なのはカメラの値段より光の当て方です。">
+  <div class="chapno">05</div>
+  <div class="pad">
+    <h2>撮り比べてみよう<br><em>iPhone / Android / 一眼</em></h2>
+    <div class="rule"></div>
+    <ul class="pts">
+      <li>3人に撮ってもらう（挙手・立候補）</li>
+      <li>3台ともパターン1（右斜め後ろ）で撮影</li>
+      <li>撮った3枚を並べて見比べる</li>
+    </ul>
+    <p class="bigmsg" style="margin-top:34px;">機種が違っても、光が同じなら<em>そんなに変わらない</em></p>
+  </div>
+</div>
+
+<div class="page" data-document-role="page" data-label="13 編集の順番" data-speaker-notes="ここから編集。さっきiPhoneで撮った写真を全員で編集します。順番が大事。まず露出で明るさ、次に色温度で色、最後にコントラストでメリハリ。この3つだけでほぼ完成します。">
+  <div class="chapno">06</div>
+  <div class="pad">
+    <h2>編集は、この順番で（<em>まず3つ</em>）</h2>
+    <div class="rule"></div>
+    <div class="steps">
+      <div class="stp"><div class="n">1</div><div class="lb">露出</div><div class="ds">明るさ</div></div>
+      <div class="stp"><div class="n">2</div><div class="lb">色温度</div><div class="ds">ホワイトバランス</div></div>
+      <div class="stp"><div class="n">3</div><div class="lb">コントラスト</div><div class="ds">メリハリ</div></div>
+    </div>
+    <p class="note" style="margin-top:24px;">この3つだけで、写真はほぼ完成します</p>
+  </div>
+</div>
+
+<div class="page" data-document-role="page" data-label="14 あと3つ" data-speaker-notes="もう一歩仕上げたいなら、あと3つ。ハイライトとシャドウで明るい部分と暗い部分を別々に。彩度で色の濃さ、ただし上げすぎ注意。最後にシャープネスで輪郭をくっきり。どれも少しずつでOKです。">
+  <div class="chapno">07</div>
+  <div class="pad">
+    <h2>もう一歩仕上げたいなら（<em>あと3つ</em>）</h2>
+    <div class="rule"></div>
+    <div class="steps">
+      <div class="stp"><div class="n">4</div><div class="lb">ハイライト / シャドウ</div><div class="ds">明暗を別々に</div></div>
+      <div class="stp"><div class="n">5</div><div class="lb">彩度</div><div class="ds">色の濃さ（上げすぎ注意）</div></div>
+      <div class="stp"><div class="n">6</div><div class="lb">シャープネス</div><div class="ds">輪郭をくっきり</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="page" data-document-role="page" data-label="15 おさらい" data-speaker-notes="今日のおさらい。1つ目、RAWで撮る。自分の色で出すため。2つ目、ライティング。光の当て方で魅力が決まる。3つ目、編集。露出・色温度・コントラスト、まずこの3つ。この流れさえ覚えておけば大丈夫です。">
+  <div class="chapno">08</div>
+  <div class="pad">
+    <h2>今日の<em>おさらい</em></h2>
+    <div class="rule"></div>
+    <ul class="pts">
+      <li>①　RAW（DNG）で撮る　＝　自分の色で出すため</li>
+      <li>②　ライティング　＝　光の当て方で魅力が決まる</li>
+      <li>③　編集　＝　露出・色温度・コントラスト、まずこの3つ</li>
+    </ul>
+  </div>
+</div>
+
+<div class="page" data-document-role="page" data-label="16 ライト投資" data-speaker-notes="最後に、どのライトを買えばいいか。新しいカメラより先に、ライトに投資した方が写真は確実に良くなります。売上30万までは小型LEDの30Wクラスで十分。30から100万なら150Wクラス。いきなり高いものは不要。今の売上に合わせて選んでください。このあと質問タイム、2次会で個別撮影もできます。">
+  <div class="pad">
+    <h2>どのライトを買えばいい？</h2>
+    <div class="rule"></div>
+    <p class="bigmsg" style="margin-bottom:32px;">新しいカメラより先に、<em>ライトに投資</em></p>
+    <div class="duo">
+      <div class="card"><div class="tag">月の売上　〜30万円</div><h3 style="font-size:30px;">小型LED（30Wクラス）</h3><p>3,000〜5,000円。小さい商品ならこれで十分。</p></div>
+      <div class="card"><div class="tag">月の売上　30〜100万円</div><h3 style="font-size:30px;">150Wクラス</h3><p>15,000〜25,000円。大きい商品や複数並べも余裕。</p></div>
+    </div>
+    <p class="note" style="margin-top:26px;">いきなり高いものは不要。今の売上に合わせて選ぶ　／　このあと質問タイム → 2次会で個別撮影も</p>
+  </div>
+</div>
+
+</body>
+</html>
